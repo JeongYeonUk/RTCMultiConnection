@@ -1,12 +1,16 @@
 // Last time updated: 2018-12-24 8:45:05 AM UTC
 "use strict";
 let recordVideoFormData = -1;
+function getRecordVideoFormData(){
+    return recordVideoFormData;
+}
 ! function() {
     // 추가
     var canvas = document.querySelector("#main-canvas");
     var videoStream = canvas.captureStream(30);
     var mediaRecorder = new MediaRecorder(videoStream);
     var chunks = [];
+    let clearFlag = false;
     mediaRecorder.ondataavailable = function(e) {
         chunks.push(e.data);
     };
@@ -15,17 +19,18 @@ let recordVideoFormData = -1;
         chunks = [];
         var videoURL = URL.createObjectURL(blob); // 클라이언트에서 재생하기위해 과정?
         console.log("녹화된 결과값 : ",blob)
+        recordVideoFormData = blob;
+        
+        //recordVideoFormData = new FormData();
+        //recordVideoFormData.append("file", blob)
+        
         //window.open(videoURL);
         //downloadURI(videoURL,"test")
-        recordVideoFormData = new FormData().append("file", blob);
         //test용
         //console.log("LocalStroage : ", blob)
         //localStorage.setItem('testVideoSrc', formData);
         
     };
-    function getRecordVideoFormData(){
-        return recordVideoFormData;
-    }
     function downloadURI(uri, name) { 
         var link = document.createElement("a"); 
         link.download = name; 
@@ -283,6 +288,10 @@ let recordVideoFormData = -1;
             redraw: function() {
                 // 추가 삭제...
                 if(!isVideoBackGround){ // 여기 내생각에 없어도 될꺼같은데 왜 없으면 안되는건지 생각해보자..
+                    tempContext.clearRect(0, 0, innerWidth, innerHeight), context.clearRect(0, 0, innerWidth, innerHeight);
+                }
+                else if(clearFlag){
+                    clearFlag = false;
                     tempContext.clearRect(0, 0, innerWidth, innerHeight), context.clearRect(0, 0, innerWidth, innerHeight);
                 }
                 //tempContext.clearRect(0, 0, innerWidth, innerHeight), context.clearRect(0, 0, innerWidth, innerHeight);
@@ -1602,6 +1611,13 @@ let recordVideoFormData = -1;
                     mediaRecorder.stop();
                 }
             }
+            if(event.data.clearFlag){
+                console.log("넘어왔잔아")
+                clearFlag = true;
+                points = [];
+                drawHelper.redraw(); 
+                syncPoints(!0);
+            }
             // 추가
             if (event.data.renderStream) return void setTemporaryLine();
             if (event.data.sdp) return void webrtcHandler.setRemoteDescription(event.data);
@@ -1614,7 +1630,10 @@ let recordVideoFormData = -1;
             }
             if (event.data.undo && points.length) {
                 var index = event.data.index;
-                if ("all" === index) return points = [], drawHelper.redraw(), void syncPoints(!0);
+                if ("all" === index) {
+                    clearFlag = true;
+                    return points = [], drawHelper.redraw(), void syncPoints(!0);
+                }
                 if (index.numberOfLastShapes) {
                     try {
                         points.length -= index.numberOfLastShapes
