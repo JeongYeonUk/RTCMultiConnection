@@ -166,7 +166,7 @@ input[disabled], button[disabled] {
     <div class="plus-box"></div>
     <div class="meeting-bottom">
       <div class="bottom-btn-box">
-        <div id="camera-selector" class="btn btn-dark">
+        <div id="camera-selector" class="onoff-cam circle-btn" onclick="focusOption()">
             <i class="active">
                 <img class="oncam" src="../img/cam2.png" alt="전면" width="40" height="40" />
                 <img class="offcam" src="../img/cam1.png" alt="후면" width="40" height="40" />
@@ -2210,7 +2210,12 @@ function replaceScreenTrack(stream) {
 
 // 카메라 목록 테스트
 
+
 const videoSelect = document.querySelector('select#videoSource');
+
+function focusOption(){
+    videoSelect.focus();   
+}
 
 function handleError(error) {
   console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
