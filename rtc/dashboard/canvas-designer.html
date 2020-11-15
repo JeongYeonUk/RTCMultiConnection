@@ -93,7 +93,7 @@ input[disabled], button[disabled] {
         </div>
         <div class="chosed-box">
           <img src="../img/back.png" class="back" onclick="mobileClickBack()"></button>
-          <div class="mobile-title">참가자</div>
+          <div class="mobile-title"></div>
           <div id="participant-boxid" >
                 <div id="participantboxact" class="participant-box ">
                   <div id="onUserStatusChanged">
@@ -320,19 +320,19 @@ input[disabled], button[disabled] {
                 </div>
            </div>
            <div class="sidebar-third">
-                <div id="participant-m" class="circle-btn btn-m">
+                <div id="participant-m" onclick="moblieClickParticipant('participant-boxid')" class="circle-btn btn-m">
                     <i class="sidebar-i">
                         <img id="btn-participant-m" src="../img/participant-btn.png" alt="participant" width="40" height="40" />
                     </i>
                     <p class="btn-label">참가자</p>
                 </div>
-                <div id="chat-m" class="circle-btn btn-m">
+                <div id="chat-m" class="circle-btn btn-m" onclick="moblieClickParticipant('chat-boxid')">
                     <i class="sidebar-i">
                     <img id="btn-chat-m"src="../img/chat-btn.png" alt="채팅" width="40" height="40" />
                     </i>
                     <p class="btn-label">채팅</p>
                 </div>
-                <div id="savebox-m" class="circle-btn btn-m">
+                <div id="savebox-m" class="circle-btn btn-m" onclick="moblieClickParticipant('save-boxid')">
                     <i class="sidebar-i ">
                         <img id="btn-savebox-m" src="../img/list1-btn.png" alt="보관함" width="40" height="35" />
                     </i>
@@ -1005,21 +1005,37 @@ function shareMyMedia2Image(recordVideoFromData2){ // 저장된 정보로 share�
 function moblieClickParticipant(id){
 
     var list = ['participant-boxid', 'chat-boxid', 'save-boxid'];
-
+    var listTitle = ['참가자','채팅','보관함'];
     for(var i=0; i<list.length; i++){
         if(list[i]==id){
+            $(".mobile-title").html(listTitle[i]);
             var tempClassName = '#'+list[i]+'';
+            $(tempClassName).removeClass('active');
             $(tempClassName).removeClass('off');
             $(tempClassName).addClass('on');
+
+            if(id=='chat-boxid'){
+                $('.chat-box').removeClass('active');
+            }else{
+                $('.chat-box').addClass('active');
+            }
+
+            if(id=='save-boxid'){
+                $('.save-box').removeClass('active');
+            }else{
+                $('.save-box').addClass('active');
+            }
         }
         else{
             var tempClassName = '#'+list[i]+'';
+            $(tempClassName).addClass('active');
             $(tempClassName).removeClass('on');
             $(tempClassName).addClass('off');
         }
     }
-
+    
     $('#sidebar').addClass('on');
+    // $('.sidebar').css("display","none");
     $('.back').css("display","block");
     $('.btn-zip').css("display","none");
     $('.mobile-title').css("display","block");
@@ -1027,8 +1043,9 @@ function moblieClickParticipant(id){
 }
 
 function mobileClickBack(){
-    $('.btn-zip').css("display","none");
     $('#sidebar').removeClass('on');
+    // $('.sidebar').css("display","block");
+    $('.btn-zip').css("display","none");
     $('.back').css("display","none");
     $('.mobile-title').css("display","none");
     
@@ -1349,6 +1366,7 @@ connection.onUserStatusChanged = function(event) {
         document.getElementById("participant-list").appendChild(table)
     }else{
         let div = document.createElement('div');
+        div.className = 'wait';
         div.innerHTML = '다른멤버가 참여할 때까지 기다려주세요';
         $("#participant-list").empty();
         document.getElementById("participant-list").appendChild(div)
@@ -2169,7 +2187,7 @@ connection.onFileEnd = function(file) {
         //if(fileSendCnt == 1){
         div.className = 'message me';
         div.innerHTML =  `<img src="../img/me1.png" class="sendmark"><b>[ ${connection.extra.userInfo.user_name}(${connection.extra.userInfo.user_dept} ] </b><br>` + html;
-        div.style.background = '#101742';
+        div.style.background = 'rgb(126, 136, 179)';
         //}
 
         if(recentFile) {
@@ -2736,7 +2754,7 @@ $("#save-label").click(function () {
 
     #other-videos {
         float:left;
-        width: 80%;
+        width: 78%;
         margin-top: 5px;
     }
   /*    6명일때
@@ -2782,7 +2800,7 @@ $("#save-label").click(function () {
     
     /* 화면 공유시 */
     #other-videos.on{
-        margin-top: 2%;
+        margin-top: 4%;
         margin-left: 2%;
         padding-left: 6%;
     }
@@ -2793,13 +2811,16 @@ $("#save-label").click(function () {
         width: 20%;
         height: 140px;
     }
+
+   
     .user-info-label.on{
         font-size: 0.8rem;
         margin-bottom: 0;
     }
     .paging-button.on{
-        padding-top: 6%;
+        padding-top: 8%;
         width: 9%;
+        margin-right: 1%;
     }
     #uploaded-container{
         height: calc(100%);
@@ -3544,7 +3565,7 @@ html
     #prev{
         width: 35px;
         height: 35px;
-        margin-left: 45%;
+        margin-left: 80%;
         margin-right: 25%;
 
     }
@@ -3596,6 +3617,9 @@ html
         display: none;
     }
     @media screen and (max-width: 768px) {
+        .media-div.on > p{
+        font-size: 1.3rem;
+        }
         #widget-container {
             position: fixed;
             bottom: 200px;
@@ -3618,6 +3642,13 @@ html
             width: 80%;
             margin-top: 0;
         }
+
+        #other-videos.on{
+            margin-top: 13%;
+            margin-left: 0;
+            padding-left: 0;
+        }
+
         .paging-button{
             height: 100%;
             width: 10%;
@@ -3625,6 +3656,18 @@ html
             padding: 0;
             padding-top: 68%;
             float:left;
+        }
+
+        .paging-button.on{
+            height: 100px;
+            margin-top: 25%;
+        }
+        .paging-button.on > div > #prev{
+            height: 100%;
+        }
+
+        .paging-button.on > div > #next{
+            height: 100%;
         }
 
         .media-div{
@@ -3636,6 +3679,12 @@ html
             /* border: 1px solid black; */
             padding: 1px;
             border-radius: 3px;
+        }
+
+        .media-div.on{
+            width: 48%;
+            height: 200px;
+            margin-left: 1%;
         }
         .media-div  video{
             width: 100%;
@@ -3668,7 +3717,7 @@ html
             height: calc(100% - 500px);
             margin-right: 0;
         }
-
+        
         #sidebar{
             display: none;
         }
@@ -3687,7 +3736,6 @@ html
         }
 
         .sidebar.on > .chosed-box > #participant-boxid{
-            margin-top: 10%;
             margin-left: 10%;
         }   
 
@@ -3701,6 +3749,7 @@ html
             margin-top: 6%;
             margin-bottom: 5%;
             float:left;
+            width: 80%;
         }
 
         #chat-boxid.on > #chatboxact > #chat-send> #txt-chat-message{
@@ -3955,6 +4004,9 @@ html
             display: none;
         }
 
+        .wait{
+            width: 100%;
+        }
     }
   </style>
 </html>
