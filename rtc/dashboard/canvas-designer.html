@@ -2066,6 +2066,19 @@ connection.onstreamended = function(event) {
     }else{
         inMobileChange();
     }
+    
+    // 사람 나갈 때 화면 다시 정렬
+    console.log("btn_record_flag",btn_record_flag);
+    console.log("isShareVideo",isShareVideo);
+    console.log("isMediaSharing",isMediaSharing);
+    if(btn_record_flag || isShareVideo || isMediaSharing){
+        $("#captiondiv").css("display","none");
+        $(".media-div").addClass("on");
+        $(".user-info-label").addClass("on");
+        $("#other-videos").addClass("on");
+        $(".paging-button").addClass("on");
+    }
+    // console.log
 };
 
 var conversationPanel = document.getElementById('conversation-panel');
@@ -3709,12 +3722,12 @@ html
         }
         #prev{
             width: 100%;
-            height: calc(100% - 500px);
+            height: 50px;
             margin-left: 20%;
         }
         #next{
             width: 100%;
-            height: calc(100% - 500px);
+            height: 50px;
             margin-right: 0;
         }
         
