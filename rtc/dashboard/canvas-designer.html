@@ -2068,10 +2068,10 @@ connection.onstreamended = function(event) {
     }
     
     // 사람 나갈 때 화면 다시 정렬
-    console.log("btn_record_flag",btn_record_flag);
+    console.log("btn_memo_flag",btn_memo_flag);
     console.log("isShareVideo",isShareVideo);
     console.log("isMediaSharing",isMediaSharing);
-    if(btn_record_flag || isShareVideo || isMediaSharing){
+    if(btn_memo_flag || isShareVideo || isMediaSharing){
         $("#captiondiv").css("display","none");
         $(".media-div").addClass("on");
         $(".user-info-label").addClass("on");
