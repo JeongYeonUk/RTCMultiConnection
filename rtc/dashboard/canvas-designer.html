@@ -921,6 +921,7 @@ function selectAllMedia(){
             tbody.innerHTML = temp;
             table.appendChild(tbody);
             $("#uploaded-list").empty();
+            console.log("table>>>>>>>>>>>>>>>",table);
             document.getElementById("uploaded-list").appendChild(table)
         }else{
             let div = document.createElement('div');
@@ -1022,6 +1023,7 @@ function moblieClickParticipant(id){
 
             if(id=='save-boxid'){
                 $('.save-box').removeClass('active');
+                selectAllMedia();
             }else{
                 $('.save-box').addClass('active');
             }
