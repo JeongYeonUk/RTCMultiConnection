@@ -306,19 +306,19 @@ input[disabled], button[disabled] {
                 </div>
            </div>
            <div class="sidebar-third">
-                <div id="participant-m" class="circle-btn btn-m">
+                <div id="participant-m" onclick="moblieClickParticipant('participant-boxid')" class="circle-btn btn-m">
                     <i class="sidebar-i">
                         <img id="btn-participant-m" src="../img/participant-btn.png" alt="participant" width="40" height="40" />
                     </i>
                     <p class="btn-label">참가자</p>
                 </div>
-                <div id="chat-m" class="circle-btn btn-m">
+                <div id="chat-m" class="circle-btn btn-m" onclick="moblieClickParticipant('chat-boxid')">
                     <i class="sidebar-i">
                     <img id="btn-chat-m"src="../img/chat-btn.png" alt="채팅" width="40" height="40" />
                     </i>
                     <p class="btn-label">채팅</p>
                 </div>
-                <div id="savebox-m" class="circle-btn btn-m">
+                <div id="savebox-m" class="circle-btn btn-m" onclick="moblieClickParticipant('save-boxid')">
                     <i class="sidebar-i ">
                         <img id="btn-savebox-m" src="../img/list1-btn.png" alt="보관함" width="40" height="35" />
                     </i>
@@ -946,17 +946,32 @@ function moblieClickParticipant(id){
     for(var i=0; i<list.length; i++){
         if(list[i]==id){
             var tempClassName = '#'+list[i]+'';
+            $(tempClassName).removeClass('active');
             $(tempClassName).removeClass('off');
             $(tempClassName).addClass('on');
+
+            if(id=='chat-boxid'){
+                $('.chat-box').removeClass('active');
+            }else{
+                $('.chat-box').addClass('active');
+            }
+
+            if(id=='save-boxid'){
+                $('.save-box').removeClass('active');
+            }else{
+                $('.save-box').addClass('active');
+            }
         }
         else{
             var tempClassName = '#'+list[i]+'';
+            $(tempClassName).addClass('active');
             $(tempClassName).removeClass('on');
             $(tempClassName).addClass('off');
         }
     }
-
+    
     $('#sidebar').addClass('on');
+    // $('.sidebar').css("display","none");
     $('.back').css("display","block");
     $('.btn-zip').css("display","none");
     $('.mobile-title').css("display","block");
@@ -964,8 +979,9 @@ function moblieClickParticipant(id){
 }
 
 function mobileClickBack(){
-    $('.btn-zip').css("display","none");
     $('#sidebar').removeClass('on');
+    // $('.sidebar').css("display","block");
+    $('.btn-zip').css("display","none");
     $('.back').css("display","none");
     $('.mobile-title').css("display","none");
     
@@ -3506,6 +3522,13 @@ html
             width: 80%;
             margin-top: 0;
         }
+
+        #other-videos.on{
+            margin-top: 10%;
+            margin-left: 0;
+            padding-left: 0;
+        }
+
         .paging-button{
             height: 100%;
             width: 10%;
@@ -3513,6 +3536,18 @@ html
             padding: 0;
             padding-top: 68%;
             float:left;
+        }
+
+        .paging-button.on{
+            height: 100px;
+            margin-top: 20%;
+        }
+        .paging-button.on > div > #prev{
+            height: 100%;
+        }
+
+        .paging-button.on > div > #next{
+            height: 100%;
         }
 
         .media-div{
@@ -3524,6 +3559,12 @@ html
             /* border: 1px solid black; */
             padding: 1px;
             border-radius: 3px;
+        }
+
+        .media-div.on{
+            width: 48%;
+            height: 200px;
+            margin-left: 1%;
         }
         .media-div  video{
             width: 100%;
@@ -3556,7 +3597,7 @@ html
             height: calc(100% - 500px);
             margin-right: 0;
         }
-
+        
         #sidebar{
             display: none;
         }
