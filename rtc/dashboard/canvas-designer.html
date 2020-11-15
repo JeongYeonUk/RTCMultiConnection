@@ -1353,6 +1353,7 @@ connection.onUserStatusChanged = function(event) {
         document.getElementById("participant-list").appendChild(table)
     }else{
         let div = document.createElement('div');
+        div.className = 'wait';
         div.innerHTML = '다른멤버가 참여할 때까지 기다려주세요';
         $("#participant-list").empty();
         document.getElementById("participant-list").appendChild(div)
@@ -2173,7 +2174,7 @@ connection.onFileEnd = function(file) {
         //if(fileSendCnt == 1){
         div.className = 'message me';
         div.innerHTML =  `<img src="../img/me1.png" class="sendmark"><b>[ ${connection.extra.userInfo.user_name}(${connection.extra.userInfo.user_dept} ] </b><br>` + html;
-        div.style.background = '#101742';
+        div.style.background = 'rgb(126, 136, 179)';
         //}
 
         if(recentFile) {
@@ -3716,6 +3717,7 @@ html
             margin-top: 6%;
             margin-bottom: 5%;
             float:left;
+            width: 80%;
         }
 
         #chat-boxid.on > #chatboxact > #chat-send> #txt-chat-message{
@@ -3928,6 +3930,9 @@ html
             display: none;
         }
 
+        .wait{
+            width: 100%;
+        }
     }
   </style>
 </html>
