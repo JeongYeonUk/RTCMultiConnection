@@ -98,7 +98,7 @@ input[disabled], button[disabled] {
         </div>
         <div class="chosed-box">
           <img src="../img/back.png" class="back" onclick="mobileClickBack()"></button>
-          <div class="mobile-title">참가자</div>
+          <div class="mobile-title"></div>
           <div id="participant-boxid" >
                 <div id="participantboxact" class="participant-box ">
                   <div id="onUserStatusChanged">
@@ -991,9 +991,10 @@ function shareMyMedia2Image(recordVideoFromData2){ // 저장된 정보로 share�
 function moblieClickParticipant(id){
 
     var list = ['participant-boxid', 'chat-boxid', 'save-boxid'];
-
+    var listTitle = ['참가자','채팅','보관함'];
     for(var i=0; i<list.length; i++){
         if(list[i]==id){
+            $(".mobile-title").html(listTitle[i]);
             var tempClassName = '#'+list[i]+'';
             $(tempClassName).removeClass('active');
             $(tempClassName).removeClass('off');
@@ -2771,6 +2772,10 @@ $("#save-label").click(function () {
         width: 20%;
         height: 140px;
     }
+
+    .media-div.on > p{
+        font-size: 1.3rem;
+    }
     .user-info-label.on{
         font-size: 0.8rem;
         margin-bottom: 0;
@@ -2778,6 +2783,7 @@ $("#save-label").click(function () {
     .paging-button.on{
         padding-top: 6%;
         width: 9%;
+        margin-right: 1%;
     }
     #uploaded-container{
         height: calc(100%);
@@ -3595,7 +3601,7 @@ html
         }
 
         #other-videos.on{
-            margin-top: 10%;
+            margin-top: 13%;
             margin-left: 0;
             padding-left: 0;
         }
@@ -3611,7 +3617,7 @@ html
 
         .paging-button.on{
             height: 100px;
-            margin-top: 20%;
+            margin-top: 25%;
         }
         .paging-button.on > div > #prev{
             height: 100%;
@@ -3687,7 +3693,6 @@ html
         }
 
         .sidebar.on > .chosed-box > #participant-boxid{
-            margin-top: 10%;
             margin-left: 10%;
         }   
 
