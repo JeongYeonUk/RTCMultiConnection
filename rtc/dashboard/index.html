@@ -746,7 +746,7 @@ $('#chk-room-password').change(function() {
 var txtRoomId = document.getElementById('txt-roomid');
 
 txtRoomId.onkeyup = txtRoomId.onblur = txtRoomId.oninput = txtRoomId.onpaste = function() {
-    localStorage.setItem('canvas-designer-roomid', txtRoomId.value);
+    //localStorage.setItem('canvas-designer-roomid', txtRoomId.value);
 };
 
 if (localStorage.getItem('canvas-designer-roomid')) {
@@ -757,7 +757,7 @@ if (localStorage.getItem('canvas-designer-roomid')) {
 var userFullName = document.getElementById('txt-user-name');
 
 userFullName.onkeyup = userFullName.onblur = userFullName.oninput = userFullName.onpaste = function() {
-    localStorage.setItem('canvas-designer-user-full-name', userFullName.value);
+    //localStorage.setItem('canvas-designer-user-full-name', userFullName.value);
 };
 
 if (localStorage.getItem('canvas-designer-user-full-name')) {

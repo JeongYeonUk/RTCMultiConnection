@@ -168,7 +168,11 @@ function serverHandler(request, response) {
                     filename = filename.replace(resolveURL('/rtc/'), '');
                     filename = filename.replace(resolveURL('/rtc'), '');
                     filename += resolveURL('/rtc/index.html');
-                } else {
+                } else if (filename.indexOf(resolveURL('/rtc')) !== -1) {
+                    filename = filename.replace(resolveURL('/rtc/'), '');
+                    filename = filename.replace(resolveURL('/rtc'), '');
+                    filename += resolveURL('/rtc/index.html');
+                }else {
                     filename += resolveURL(config.homePage);
                 }
             }

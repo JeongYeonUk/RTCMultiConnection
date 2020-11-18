@@ -383,7 +383,31 @@ input[disabled], button[disabled] {
 <script>
 const recognition = new webkitSpeechRecognition();//마이크
 navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+function getURLParameter(name) {
+	return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+}
+function hideURLParams() {
+	//Parameters to hide (ie ?success=value, ?error=value, etc)
+	var hide = ['success','error'];
+	for(var h in hide) {
+		if(getURLParameter(h)) {
+			history.replaceState(null, document.getElementsByTagName("title")[0].innerHTML, window.location.pathname);
+		}
+	}
+}
+function noEvent() { // 새로 고침 방지
+    if (event.keyCode == 116) {
+        alert("새로고침을 할 수 없습니다.");
+        event.keyCode = 2;
+        return false;
+    } else if (event.ctrlKey
+            && (event.keyCode == 78 || event.keyCode == 82)) {
+        return false;
+    }
+}
+document.onkeydown = noEvent;
 
+window.onload = hideURLParams;
 let init_btn_sync = false; // 방버튼정보를 최초 동기화 하였는가??
 let init_share_media = false; // share정보 최초 동기화 하였는가??
 
@@ -440,6 +464,7 @@ function audioHandler(e) {
 
     }else if(e.type == 'seeked'){
         console.log("audio seeked ",audio.currentTime)
+        audio.pause();
         video.currentTime = audio.currentTime;
         syncMediaControls('seeked',audio.currentTime)
         
@@ -512,6 +537,29 @@ function changeRecordBtn(input){
         $("#btn-record-message").html("Start")
     }
 }
+$('#btn-record-message-m').click(function(){
+    btn_record_flag = !btn_record_flag;
+    if(btn_record_flag){
+        if(!btn_memo_flag){
+            alert("공유중인 화면이 없습니다.")
+            btn_record_flag = false;
+            return;
+        }
+        designer.postMessage({
+            recording: true,
+            content : true
+        });
+        audioRecord(startAudioRecord);
+    }else{
+        designer.postMessage({
+            recording: true,
+            content : false
+        });
+        stopAudioRecord();
+        recordClock(); // 녹화한 미디어와 추가 입력 받아서 서버로 보내는 함수
+    }
+    changeRecordBtn(btn_record_flag)
+})
 $('#btn-record-message').click(function(){
     btn_record_flag = !btn_record_flag;
     if(btn_record_flag){
@@ -1432,6 +1480,7 @@ connection.onmessage = function(event) {
         }else if('plz-media-pause'===event.data.mediaControls){
             audio.pause();
         }else if('plz-media-seeked'===event.data.mediaControls){
+            audio.pause();
             audio.currentTime = event.data.currentTime;
         }else if('plz-media-timeupdate'===event.data.mediaControls){
             console.log("time update ???? ")
@@ -2289,6 +2338,10 @@ designer.appendTo(document.getElementById('widget-container'), function() {
         //alert("모바일!")
         document.querySelector('#mobile-device-box').style.display = 'block';
         videoSelect.onchange = changeCamera;
+        $('#main-audio').css({
+            width: "calc(80%)",
+            bottom: "200px",
+        });
         //   
     }else{
         //console.log("DetectRTC ,", DetectRTC)
