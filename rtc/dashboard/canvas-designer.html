@@ -34,7 +34,7 @@
   <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
   <!--Record streams audio 모듈 추가-->
   <script src="/node_modules/recordrtc/RecordRTC.js"></script>
-
+  <script src="/dist/sweetalert/dist/sweetalert.min.js"></script>
 <style type="text/css">
 /* html, body, section, ul, li, nav, a, h1, h2 {
     padding: 0;
@@ -383,7 +383,31 @@ input[disabled], button[disabled] {
 <script>
 const recognition = new webkitSpeechRecognition();//마이크
 navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+function getURLParameter(name) {
+	return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+}
+function hideURLParams() {
+	//Parameters to hide (ie ?success=value, ?error=value, etc)
+	var hide = ['success','error'];
+	for(var h in hide) {
+		if(getURLParameter(h)) {
+			history.replaceState(null, document.getElementsByTagName("title")[0].innerHTML, window.location.pathname);
+		}
+	}
+}
+function noEvent() { // 새로 고침 방지
+    if (event.keyCode == 116) {
+        swal("새로고침을 할 수 없습니다.");
+        event.keyCode = 2;
+        return false;
+    } else if (event.ctrlKey
+            && (event.keyCode == 78 || event.keyCode == 82)) {
+        return false;
+    }
+}
+document.onkeydown = noEvent;
 
+window.onload = hideURLParams;
 let init_btn_sync = false; // 방버튼정보를 최초 동기화 하였는가??
 let init_share_media = false; // share정보 최초 동기화 하였는가??
 
@@ -440,6 +464,7 @@ function audioHandler(e) {
 
     }else if(e.type == 'seeked'){
         console.log("audio seeked ",audio.currentTime)
+        audio.pause();
         video.currentTime = audio.currentTime;
         syncMediaControls('seeked',audio.currentTime)
         
@@ -512,11 +537,34 @@ function changeRecordBtn(input){
         $("#btn-record-message").html("Start")
     }
 }
+$('#btn-record-message-m').click(function(){
+    btn_record_flag = !btn_record_flag;
+    if(btn_record_flag){
+        if(!btn_memo_flag){
+            swal("공유중인 화면이 없습니다.")
+            btn_record_flag = false;
+            return;
+        }
+        designer.postMessage({
+            recording: true,
+            content : true
+        });
+        audioRecord(startAudioRecord);
+    }else{
+        designer.postMessage({
+            recording: true,
+            content : false
+        });
+        stopAudioRecord();
+        recordClock(); // 녹화한 미디어와 추가 입력 받아서 서버로 보내는 함수
+    }
+    changeRecordBtn(btn_record_flag)
+})
 $('#btn-record-message').click(function(){
     btn_record_flag = !btn_record_flag;
     if(btn_record_flag){
         if(!btn_memo_flag){
-            alert("공유중인 화면이 없습니다.")
+            swal("공유중인 화면이 없습니다.")
             btn_record_flag = false;
             return;
         }
@@ -541,20 +589,38 @@ function recordClock(){
         let timerId = setTimeout(recordClock, 500);
         
     }else{
-        if(!confirm("녹화한 미디어를 저장하시겠습니까?")){
-            recordVideoFormData = null;
-            recordAudioFormData = null;
-            alert("취소 하였습니다!")
-            return;
-        }else{
-            $('#mediaFormToSave').modal('show');
-        }
+        swal({
+            title: "SAVE RECORD",
+            text: "녹화한 미디어를 저장하시겠습니까?",
+            icon: "info",
+            buttons: true,
+            dangerMode: false,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+                $('#mediaFormToSave').modal('show');
+            } else {
+                swal("RECORD MEDIA", "미디어 저장을 취소 하였습니다!", "warning");
+            }
+          });
+
+
+        //if(!confirm("녹화한 미디어를 저장하시겠습니까?")){
+        //    
+        //    recordVideoFormData = null;
+        //    recordAudioFormData = null;
+        //    swal("RECORD MEDIA", "미디어 저장을 취소 하였습니다!", "warning");
+            //swal("취소 하였습니다!")
+        //    return;
+        //}else{
+        //    $('#mediaFormToSave').modal('show');
+        //}
     }
 }
 let myRecordedData = [];
 $('#btn-save-record-media-modal').click(function(){
     if(!$('#txt-media-title').val().toString()){
-        alert("저장할 이름을 입력해주세요.")
+        swal("저장할 이름을 입력해주세요.")
         return;
     }
     $('#btn-save-record-media-modal').attr('disabled', true);
@@ -596,7 +662,8 @@ $('#btn-save-record-media-modal').click(function(){
         //console.log("가지고있던 오디오 ? ",recordAudioFormData )
         //shareMyMedia(b64toBlob(data.video,"video/mp4",512),b64toBlob(data.audio,"audio/webm;codecs=opus",512));
         if(data.message == 'success')
-            alert("저장되었습니다!!!")
+            //swal("저장되었습니다!!!")
+            swal("RECORD MEDIA", "저장되었습니다 !", "success");
             if(!$("#saveboxact").hasClass("active")){ // 이미 활성상태이면
                 selectAllMedia()
             }
@@ -624,7 +691,7 @@ function b64toBlob(b64Data, contentType='', sliceSize=512) {
     return blob;
   }
 $('.modal-close-btn').click(function(){
-    alert("취소 하였습니다!")
+    swal("취소 하였습니다!")
     recordVideoFormData = null;
     recordAudioFormData = null;
     $('#mediaFormToSave').modal('hide');
@@ -636,7 +703,7 @@ $('#btn-memo-message-m').click(function(){
     }else{
         if(isShareVideo || isMediaSharing){
             if(isShareMyVideo || isShareMyMedia){
-                alert("공유가 중지되었습니다.")
+                swal("공유가 중지되었습니다.")
                 changeShareMyCamera(false);
             }
             connection.send({
@@ -656,7 +723,7 @@ $('#btn-memo-message').click(function() {
     }else{
         if(isShareVideo || isMediaSharing){
             if(isShareMyVideo || isShareMyMedia){
-                alert("공유가 중지되었습니다.")
+                swal("공유가 중지되었습니다.")
                 changeShareMyCamera(false);
             }
             connection.send({
@@ -677,17 +744,43 @@ $('#btn-white-board').click(function(){
     }
     if(isShareVideo || isMediaSharing){
         if(isShareMyVideo || isShareMyMedia){
-            alert("공유가 중지되었습니다.")
+            swal("공유가 중지되었습니다.")
+            mainVideoControlHide(designer.removeMainVideo);
+            connection.send({
+                mainVideo: 'plz-remove-main-video'
+            });
+            designer.backgroundWhite();
             changeShareMyCamera(false);
-        }else if(!confirm("지금 타사용자가 미디어를 공유중입니다. 타사용자의 미디어공유를 중지하시겠습니까?")){
-            return;
         }
-        mainVideoControlHide(designer.removeMainVideo);
+        //else if(!confirm("지금 타사용자가 미디어를 공유중입니다. 타사용자의 미디어공유를 중지하시겠습니까?")){
+        //    return;
+        //}
+        else{
+            swal({
+                title: "STOP SHARING",
+                text: "지금 타사용자가 미디어를 공유중입니다. 타사용자의 미디어공유를 중지하시겠습니까?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: false,
+              })
+              .then((willDelete) => {
+                if (willDelete) {
+                    //$('#mediaFormToSave').modal('show');
+                    swal("SHARING", "화이트보드를 공유합니다", "success");
+                    mainVideoControlHide(designer.removeMainVideo);
+                    connection.send({
+                        mainVideo: 'plz-remove-main-video'
+                    });
+                    designer.backgroundWhite();
+                } else {
+                    swal("STOP SHARING", "화이트 보드 공유를 취소합니다", "warning");
+                    return;
+                }
+              });
+        }
+
+        //mainVideoControlHide(designer.removeMainVideo);
     }
-    connection.send({
-        mainVideo: 'plz-remove-main-video'
-    });
-    designer.backgroundWhite();
 })
 $("#btn-white-board-m").click(function(){
     if(!btn_memo_flag){
@@ -697,12 +790,31 @@ $("#btn-white-board-m").click(function(){
     }
     if(isShareVideo || isMediaSharing){
         if(isShareMyVideo || isShareMyMedia){
-            alert("공유가 중지되었습니다.")
+            swal("공유가 중지되었습니다.")
             changeShareMyCamera(false);
-        }else if(!confirm("지금 타사용자가 미디어를 공유중입니다. 타사용자의 미디어공유를 중지하시겠습니까?")){
-            return;
+        }else{
+            swal({
+                title: "STOP SHARING",
+                text: "지금 타사용자가 미디어를 공유중입니다. 타사용자의 미디어공유를 중지하시겠습니까?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: false,
+              })
+              .then((willDelete) => {
+                if (willDelete) {
+                    //$('#mediaFormToSave').modal('show');
+                    swal("SHARING", "화이트보드를 공유합니다", "success");
+                    mainVideoControlHide(designer.removeMainVideo);
+                    connection.send({
+                        mainVideo: 'plz-remove-main-video'
+                    });
+                    designer.backgroundWhite();
+                } else {
+                    swal("STOP SHARING", "화이트 보드 공유를 취소합니다", "warning");
+                    return;
+                }
+              });
         }
-        mainVideoControlHide(designer.removeMainVideo);
     }
     connection.send({
         mainVideo: 'plz-remove-main-video'
@@ -817,7 +929,7 @@ function sendMediaSrc2Image(sharedRecordVideo,callback){
             requestId : connection.extra.userFullName
         });
     }else{
-        alert("저장된 미디어를 불러오고있습니다.")
+        swal("저장된 미디어를 불러오고있습니다.")
         finishShareMidia = true;
         initIntaval();
         setTimeout(loadDuration,500,false)
@@ -849,7 +961,7 @@ function sendMediaSrc(sharedRecordAudio,sharedRecordVideo,callback){
             requestId : connection.extra.userFullName
         });
     }else{
-        alert("저장된 미디어를 불러오고있습니다.")
+        swal("저장된 미디어를 불러오고있습니다.")
         finishShareMidia = true;
         initIntaval();
         setTimeout(loadDuration,500,true)
@@ -948,20 +1060,49 @@ $(document).on("click",".media-element",function(){
     var tr = $(this);
     var td = tr.children();
     var title = td.eq(1).text();
-    let searchFromServer = confirm("저장된" + title + " 미디어를 공유하시겠습니까?");
-    if(searchFromServer){
-        if(!btn_memo_flag){
-            if(init_btn_sync || init_share_media){
-                init_btn_sync = true; // 방버튼정보를 최초 동기화 하였는가??
-                init_share_media = true; // share정보 최초 동기화 하였는가??
-            }
-            btn_memo_flag = true; // 회의화면 or canvas화면 btn
-            connection.send("plz-memo-to-true")
-            changeMemoBtn(btn_memo_flag)
-        }
-        getMidiasFromDB(title)
+    //let searchFromServer = confirm("저장된" + title + " 미디어를 공유하시겠습니까?");
 
-    }
+    swal({
+        title: "MEDIA SHARING",
+        text: "저장된" + title + " 미디어를 공유하시겠습니까?",
+        icon: "info",
+        buttons: true,
+        dangerMode: false,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+            //$('#mediaFormToSave').modal('show');
+            //swal("SHARING", "미디어를 공유합니다", "success");
+            if(!btn_memo_flag){
+                if(init_btn_sync || init_share_media){
+                    init_btn_sync = true; // 방버튼정보를 최초 동기화 하였는가??
+                    init_share_media = true; // share정보 최초 동기화 하였는가??
+                }
+                btn_memo_flag = true; // 회의화면 or canvas화면 btn
+                connection.send("plz-memo-to-true")
+                changeMemoBtn(btn_memo_flag)
+            }
+            getMidiasFromDB(title)
+        } else {
+            swal("STOP SHARING", "미디어 공유를 취소합니다", "warning");
+            return;
+        }
+      });
+
+
+    //if(searchFromServer){
+    //    if(!btn_memo_flag){
+    //        if(init_btn_sync || init_share_media){
+    //            init_btn_sync = true; // 방버튼정보를 최초 동기화 하였는가??
+    //            init_share_media = true; // share정보 최초 동기화 하였는가??
+    //        }
+    //        btn_memo_flag = true; // 회의화면 or canvas화면 btn
+    //        connection.send("plz-memo-to-true")
+    //        changeMemoBtn(btn_memo_flag)
+    //    }
+    //    getMidiasFromDB(title)
+
+    //}
 }); 
 
 function getMidiasFromDB(title){
@@ -1099,7 +1240,7 @@ async function loadDuration(isVideo){
 
 function stopAudioRecord() {
   var recorder = connection.recorder;
-  if(!recorder) return alert('No recorder found.');
+  if(!recorder) return swal('No recorder found.');
   recorder.stopRecording(function() {
     var blob = recorder.getBlob();
     var audioURL = URL.createObjectURL(blob); 
@@ -1432,6 +1573,7 @@ connection.onmessage = function(event) {
         }else if('plz-media-pause'===event.data.mediaControls){
             audio.pause();
         }else if('plz-media-seeked'===event.data.mediaControls){
+            audio.pause();
             audio.currentTime = event.data.currentTime;
         }else if('plz-media-timeupdate'===event.data.mediaControls){
             console.log("time update ???? ")
@@ -1457,7 +1599,8 @@ connection.onmessage = function(event) {
                 if(receiveCnt == toShareCnt || toShareCnt != connection.getAllParticipants().length){
                     toShareCnt = -1;
                     receiveCnt = -1;
-                    alert("미디어 공유가 완료되었습니다.")
+                    //swal("미디어 공유가 완료되었습니다.")
+                    swal("SHARE MEDIA", "미디어 공유가 완료되었습니다.", "success");
                     finishShareMidia = true;
                     console.log("isShareMyMedia",isShareMyMedia)
                     initIntaval();
@@ -1489,12 +1632,12 @@ connection.onmessage = function(event) {
                     finishShareMidia = true; 
                 }
                 if(isShareMyVideo){
-                    alert(event.data.requestId +" 사용자의 공유 요청으로 카메라 공유가 중지됩니다.")
+                    swal(event.data.requestId +" 사용자의 공유 요청으로 카메라 공유가 중지됩니다.")
                     changeShareMyCamera(false);   
                     isShareMyVideo = false; 
                     isShareVideo = false;
                 }else if(isShareMyMedia){
-                    alert(event.data.requestId +" 사용자의 공유 요청으로 미디어 공유가 중지됩니다.")
+                    swal(event.data.requestId +" 사용자의 공유 요청으로 미디어 공유가 중지됩니다.")
                     isShareMyMedia = false;
                 }
                 clearMedia();
@@ -1519,11 +1662,11 @@ connection.onmessage = function(event) {
                     finishShareMidia = true; 
                 }
                 if(isShareMyVideo){
-                    alert(event.data.requestId +" 사용자의 공유 요청으로 카메라 공유가 중지됩니다.")
+                    swal(event.data.requestId +" 사용자의 공유 요청으로 카메라 공유가 중지됩니다.")
                     changeShareMyCamera(false);   
                     isShareMyVideo = false; 
                 }else if(isShareMyMedia){
-                    alert(event.data.requestId +" 사용자의 공유 요청으로 미디어 공유가 중지됩니다.")
+                    swal(event.data.requestId +" 사용자의 공유 요청으로 미디어 공유가 중지됩니다.")
                     isShareMyMedia = false;
                 }
                 if(isShareMyVideo && isShareVideo){
@@ -1551,11 +1694,11 @@ connection.onmessage = function(event) {
     if(event.data.mainVideo === 'plz-find-main-video'){ // 비디오를 찾아서 메인비디오에 띄워라
         if(!event.data.target_id){
             if(isShareMyVideo){
-                alert(event.data.requestId +" 사용자의 공유 요청으로 카메라 공유가 중지됩니다.")
+                swal(event.data.requestId +" 사용자의 공유 요청으로 카메라 공유가 중지됩니다.")
                 changeShareMyCamera(false);   
                 isShareMyVideo = false; 
             }else if(isShareMyMedia){
-                alert(event.data.requestId +" 사용자의 공유 요청으로 미디어 공유가 중지됩니다.")
+                swal(event.data.requestId +" 사용자의 공유 요청으로 미디어 공유가 중지됩니다.")
                 isShareMyMedia = false;
             }
             isShareVideo = true;
@@ -1586,7 +1729,7 @@ connection.onmessage = function(event) {
     if(event.data.mainVideo === 'plz-remove-main-video'){ // 메인비디오 지우기 + 화이트보드로 이동
         if(isShareVideo || isMediaSharing){
             if(isShareMyVideo || isShareMyMedia){
-                alert("공유가 중지되었습니다.")
+                swal("공유가 중지되었습니다.")
                 changeShareMyCamera(false);
             }
             mainVideoControlHide(designer.removeMainVideo);
@@ -2289,6 +2432,10 @@ designer.appendTo(document.getElementById('widget-container'), function() {
         //alert("모바일!")
         document.querySelector('#mobile-device-box').style.display = 'block';
         videoSelect.onchange = changeCamera;
+        $('#main-audio').css({
+            width: "calc(80%)",
+            bottom: "200px",
+        });
         //   
     }else{
         //console.log("DetectRTC ,", DetectRTC)
@@ -2307,10 +2454,10 @@ designer.appendTo(document.getElementById('widget-container'), function() {
         connection.open(params.sessionid, function(isRoomOpened, roomid, error) {
             if (error) {
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                    alert('Someone already created this room. Please either join or create a separate room.');
+                    swal('Someone already created this room. Please either join or create a separate room.');
                     return;
                 }
-                alert(error);
+                swal(error);
             }
 
             connection.socket.on('disconnect', function() {
@@ -2322,27 +2469,27 @@ designer.appendTo(document.getElementById('widget-container'), function() {
         connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
             if (error) {
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                    alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
+                    swal('This room does not exist. Please either create it or wait for moderator to enter in the room.');
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
-                    alert('Room is full.');
+                    swal('Room is full.');
                     return;
                 }
                 if (error === connection.errors.INVALID_PASSWORD) {
                     connection.password = prompt('Please enter room password.') || '';
                     if(!connection.password.length) {
-                        alert('Invalid password.');
+                        swal('Invalid password.');
                         return;
                     }
                     connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
                         if(error) {
-                            alert(error);
+                            swal(error);
                         }
                     });
                     return;
                 }
-                alert(error);
+                swal(error);
             }
             initBtnClock();
             connection.socket.on('disconnect', function() {
@@ -2390,7 +2537,7 @@ function addStreamStopListener(stream, callback) {
 function replaceTrack(videoTrack, screenTrackId) {
     if (!videoTrack) return;
     if (videoTrack.readyState === 'ended') {
-        alert('Can not replace an "ended" track. track.readyState: ' + videoTrack.readyState);
+        swal('Can not replace an "ended" track. track.readyState: ' + videoTrack.readyState);
         return;
     }
     connection.getAllParticipants().forEach(function(pid) {
@@ -2589,7 +2736,7 @@ $(".invitelink i").click(function (e) {
     createInput.select();
     document.execCommand('copy');
     document.getElementById("invitelink").removeChild(createInput);
-    alert("링크를 복사하였습니다");
+    swal("COPY LINK", "초대 링크가 복사되었습니다.", "success");
 });
 // 캠 끄기
 $("#onoff-cam i").click(function (e) {
@@ -2645,7 +2792,7 @@ $("#onoff-data i").click(function () {
         offsignvideo();
     }
 
-    alert("onoff-data");
+    swal("onoff-data");
 });
 //참여자 sidebar 클릭시
 $("#participant-label").click(function () {
