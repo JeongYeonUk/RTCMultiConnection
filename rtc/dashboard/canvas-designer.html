@@ -913,7 +913,7 @@ function selectAllMedia(){
             let temp = '';
             for(let i=data.media.length-1;i>=0;i--){
                 if(data.media[i].is_video){
-                    temp += '<tr class="media-element"><td><img class="rec_class" src="../img/video.png"></td><td>'+data.media[i].media_title+'</td><td>'+uploadDate(data.media[i].video_upload_time)+'</td></tr>';
+                    temp += '<tr class="media-element"><td><img class="rec_class" src="../img/video.png"></td><td >'+data.media[i].media_title+'</td><td>'+uploadDate(data.media[i].video_upload_time)+'</td></tr>';
                 }else{
                     temp += '<tr class="media-element"><td><img class="rec_class" src="../img/image.png"></td><td>'+data.media[i].media_title+'</td><td>'+uploadDate(data.media[i].video_upload_time)+'</td></tr>';
                 }
@@ -1308,7 +1308,7 @@ designer.setTools({
     text: false,
     image: true,
     pdf: false,
-    eraser: true,
+    eraser: false,
     line: false,
     arrow: false,
     dragSingle: false,
@@ -2764,7 +2764,7 @@ $("#save-label").click(function () {
         text-decoration:none ;
         font-size: 25px;
         font-family: "Fredoka One";
-        color:rgb(41 58 151);
+        color: rgb(147 166 253);
     }
 
     #other-videos {
@@ -3633,6 +3633,7 @@ html
         display: none;
     }
     @media screen and (max-width: 768px) {
+      
         .media-div.on > p{
         font-size: 1.3rem;
         }
