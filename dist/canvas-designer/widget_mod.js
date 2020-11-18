@@ -3222,6 +3222,8 @@ function getRecordVideoFormData() {
               fillStyleText.focus();
           }),
           addEvent(btnPencilDone, "click", function () {
+            //setDefaultSelectedIcon(),
+            (setSelection(document.getElementById("pencil-icon"), "Pencil")),
             (pencilContainer.style.display = "none"),
               (pencilColorContainer.style.display = "none"),
               (pencilLineWidth = strokeStyleText.value),
