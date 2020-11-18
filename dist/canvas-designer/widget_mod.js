@@ -197,6 +197,8 @@ function getRecordVideoFormData() {
   }
 
   function setSelection(element, prop) {
+    console.log("SETSELECTION ! ", element);
+    console.log("prop !", prop)
     endLastPath(), hideContainers(), is.set(prop);
     var selected = document.getElementsByClassName("selected-shape")[0];
     selected &&
