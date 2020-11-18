@@ -3175,6 +3175,7 @@
                 pencilContainer.style.display = 'none';
                 pencilColorContainer.style.display = 'none';
 
+                designer.setSelected('pencil');
                 pencilLineWidth = strokeStyleText.value;
                 pencilStrokeStyle = hexToRGBA(fillStyleText.value, alpha);
             });

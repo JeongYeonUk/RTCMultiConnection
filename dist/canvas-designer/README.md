@@ -313,7 +313,7 @@ You can force/set your own tool-icons:
 designer.icons = {
   line: "/icons/line.png",
   arrow: "/icons/arrow.png",
-  pencil: "/icons/pencil.png",
+  pencil: "/icons/pen1.png",
   dragSingle: "/icons/dragSingle.png",
   dragMultiple: "/icons/dragMultiple.png",
   eraser: "/icons/eraser.png",

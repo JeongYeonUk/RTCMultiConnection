@@ -179,8 +179,17 @@
             box-shadow: none;
             background: #eeeeee;
         }
+        #pencil-icon{
+            display:inline;
+            background-image: url("../canvas-designer/icons/pen2.png");
+            background-size: 40px;
+        }
+        #pencil-icon  .selected-shape{
+            display:inline;
+             background-color: #00A2E8;
+        }
         .selected-shape {
-            background: #eeeeee!important;
+            background: #eeeeee;
         }
         /* surface */
 
@@ -469,6 +478,12 @@
             vertical-align: middle;
             cursor: pointer;
         }
+         /* body{
+             width: 500px;
+                zoom: 1;
+            } */
+      
+            
     </style>
 </head>
 
@@ -481,7 +496,9 @@
     <!-- toolbox -->
 
     <section id="tool-box" class="tool-box">
-        <canvas id="pencil-icon" width="40" height="40" title="Panchil"></canvas>
+         <!-- <img  src="../canvas-designer/icons/pen2.png" alt="펜" width="40" height="40" ><canvas id="pencil-icon" width="40" height="40" title="Panchil"></canvas></img> -->
+         <canvas width="40" height="40" id="pencil-icon"  title="Panchil" style="display: inline;"></canvas> 
+
         <canvas id="marker-icon" width="40" height="40" title="Marker"></canvas>
 
         <canvas id="eraser-icon" width="40" height="40" title="Erase drawings"></canvas>
@@ -630,7 +647,7 @@
     <section id="pencil-container" class="context-popup colors-container">
 
         <div class="input-div">
-            <label for="pencil-stroke-style">Thickness:</label>
+            <label for="pencil-stroke-style">펜 두께:</label>
             <select id="pencil-stroke-style">
                 <option value='1'>1</option>
                 <option value='2'>2</option>
@@ -660,7 +677,7 @@
             </select>
         </div>
         <div class="input-div" id='pencil-color-container'>
-            <label for="pencil-fill-style">Fill Color:</label>
+            <label for="pencil-fill-style">펜 color:</label>
             <div id="pencil-selected-color"></div>
             <div id="pencil-fill-colors" class='context-popup'>
                 <div class="top">
